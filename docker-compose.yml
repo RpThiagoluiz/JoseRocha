@@ -1,5 +1,8 @@
-# Para desenvolvimento, rodamos apenas o banco de dados aqui.
-# A aplicação Spring Boot (backend) roda localmente e conecta a este PostgreSQL.
+# Docker Compose para ambiente "Plug and Play"
+# Opção 1: Rodar apenas o banco (desenvolvimento local)
+#   - Comente o serviço 'backend' e rode: docker compose up postgres
+# Opção 2: Rodar tudo via Docker (produção/teste)
+#   - Rode: docker compose up
 
 services:
   postgres:
@@ -19,6 +22,23 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: assets-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
 
 volumes:
   postgres_data:
