@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, development]
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run tests
+        run: ./mvnw -q test -B
+        working-directory: backend
+
+  docker:
+    name: Docker build & run
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create .env for compose
+        run: |
+          echo "POSTGRES_USER=admin" >> .env
+          echo "POSTGRES_PASSWORD=admin" >> .env
+          echo "POSTGRES_DB=assets_db" >> .env
+
+      - name: Build and start stack
+        run: docker compose up -d --build
+
+      - name: Wait for backend
+        run: |
+          echo "Waiting for backend to be ready..."
+          for i in $(seq 1 40); do
+            if curl -sf http://localhost:8080/assets > /dev/null; then break; fi
+            if [ "$i" -eq 40 ]; then echo "Backend did not become ready"; exit 1; fi
+            sleep 3
+          done
+
+      - name: Validate API
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/assets)
+          [ "$code" = "200" ] || (echo "Expected 200, got $code"; exit 1)
+
+      - name: Backend logs on failure
+        if: failure()
+        run: docker compose logs backend
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
