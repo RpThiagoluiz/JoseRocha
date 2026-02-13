@@ -8,7 +8,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
- * Base class for integration tests using Testcontainers with PostgreSQL.
+ * Base class for integration tests. Configures a single shared PostgreSQL container
+ * via Testcontainers and injects datasource properties with {@link org.springframework.test.context.DynamicPropertySource},
+ * so all integration tests use the same container.
  */
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
