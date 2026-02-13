@@ -19,4 +19,13 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
      * @return true if an asset exists with this serial number, false otherwise
      */
     boolean existsBySerialNumber(String serialNumber);
+
+    /**
+     * Checks whether an asset with the given serial number exists with a different ID (for update validation).
+     *
+     * @param serialNumber the serial number to check
+     * @param id           the asset ID to exclude (e.g. current entity being updated)
+     * @return true if another asset exists with this serial number
+     */
+    boolean existsBySerialNumberAndIdNot(String serialNumber, UUID id);
 }

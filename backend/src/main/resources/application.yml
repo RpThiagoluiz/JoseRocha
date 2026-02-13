@@ -3,9 +3,9 @@ spring:
     name: assets-manager
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/${POSTGRES_DB:assets_db}
-    username: ${POSTGRES_USER:admin}
-    password: ${POSTGRES_PASSWORD:admin}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/${POSTGRES_DB:assets_db}}
+    username: ${SPRING_DATASOURCE_USERNAME:${POSTGRES_USER:admin}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD:admin}}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
@@ -25,6 +25,9 @@ spring:
 
 server:
   port: ${SERVER_PORT:8080}
+  error:
+    whitelabel:
+      enabled: false
 
 # Springdoc / Swagger UI (optional overrides)
 springdoc:
