@@ -1,6 +1,5 @@
 # Build / Maven
 target/
-.mvn/
 
 # IDEs
 .idea/
