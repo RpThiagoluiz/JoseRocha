@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+
+Structure: /backend is for Java Spring Boot. /frontend is for React. docker-compose.yml stays in root.
+Docker: All services must be containerized.

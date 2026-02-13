@@ -1,0 +1,16 @@
+# Build / Maven
+target/
+.mvn/
+
+# IDEs
+.idea/
+.vscode/
+
+# Node (se houver frontend)
+node_modules/
+
+# Logs
+*.log
+
+# OS
+.DS_Store

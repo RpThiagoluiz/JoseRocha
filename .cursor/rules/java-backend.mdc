@@ -1,0 +1,21 @@
+---
+alwaysApply: true
+---
+
+(Context: Java 17, Spring Boot 3, Backend Development):
+
+Architecture: Enforce Clean Architecture principles tailored for Microservices. Layers: web (Controllers), service (Business Logic), persistence (Repositories), domain (Entities), dto (Data Transfer Objects).
+
+Coding Standards: Use English for all code. Enforce SOLID principles.
+
+DTO Pattern: NEVER return JPA Entities in Controllers. Use Java Records (available in Java 17) for DTOs. Use MapStruct for mapping.
+
+Error Handling: Implement a Global Exception Handler using @ControllerAdvice and ProblemDetails (RFC 7807).
+
+Testing: Prioritize JUnit 5 and Mockito. Integration tests must use Testcontainers.
+
+Lombok: Use @Data, @Builder, @AllArgsConstructor.
+
+Validation: Use Jakarta Bean Validation (@Valid, @NotNull) on DTOs.
+
+Documentation: Public methods must have Javadoc.
