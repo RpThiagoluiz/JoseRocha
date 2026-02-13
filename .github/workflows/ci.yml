@@ -20,7 +20,7 @@ jobs:
           cache: maven
 
       - name: Run tests
-        run: ./mvnw -q test -B
+        run: bash mvnw -q test -B
         working-directory: backend
 
   docker:
