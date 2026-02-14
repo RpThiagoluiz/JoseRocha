@@ -34,3 +34,11 @@ O script `prepare` configurará o Husky. A partir daí, todo commit estará suje
 - **.husky/** — Hooks do Git (validação de commit)
 
 Documentação detalhada de como rodar o backend está em `documents/README_TECNICO.md`.
+
+## Update
+
+- [ ] Decisão pelo vite (não precisar do craco para o CRA)
+- [ ] Arquitetura mais limpa
+- [ ] Utilização dos mdcs/rules para o cursor - otimizar processos mais mecanicos.
+- [ ] Tempo de atuação (3h back | 1h front)
+- [ ] Não existe rota de auth, qlq email valido e senha passa
