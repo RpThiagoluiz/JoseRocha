@@ -1,10 +1,14 @@
+import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from '@/contexts'
+import { AppRoutes } from '@/routes'
+
 function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <main className="container mx-auto p-4">
-        <h1 className="text-2xl font-semibold">Assets Manager</h1>
-      </main>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 
