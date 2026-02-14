@@ -1,0 +1,83 @@
+---
+description: Integration
+globs: ['**/*.tsx']
+alwaysApply: false
+---
+
+# API Integration & State Management Rules
+
+Follow this strictly when adding API logic to existing UI components.
+
+## 1. Integration Workflow (Order of Operations)
+
+Integration **ALWAYS** follows UI implementation. Do not write API logic before the component exists.
+
+1.  **Phase 1: UI Component** (Done)
+    - Component is created in `components/` or `pages/`.
+    - Layout, styles, and static interactions are finished.
+2.  **Phase 2: API Service**
+    - Define types in `api/types/`.
+    - Define endpoints in `api/endpoints/`.
+    - Create the async function in `api/services/` (Pure function, no state).
+3.  **Phase 3: The Integration Hook**
+    - Create a custom hook in `hooks/` (e.g., `useLogin.ts`, `useFetchData.ts`).
+    - **Constraint:** The hook manages state (`loading`, `error`, `data`) and calls the service.
+4.  **Phase 4: Component Binding**
+    - Import the hook into the UI component.
+    - Bind actions (`onSubmit`, `onClick`) and state (`isLoading`) to the UI.
+
+## 2. The "Clean Hook" Pattern
+
+Hooks must be reusable and strictly separated from UI rendering.
+
+### Anatomy of an Integration Hook
+
+1.  **State:** Manages `isLoading`, `data`, and `error`.
+2.  **Error Mapping:** Contains a local dictionary mapping Error Codes to User Messages.
+3.  **Notification:** Triggers a toast/notification on error automatically.
+4.  **Return:** Exposes interaction methods and state, not internal logic.
+
+### Code Pattern Example
+
+```typescript
+import { useState } from 'react';
+import { authService } from '@/api/services/auth.service';
+import { useNotification } from '@/hooks/useNotification'; // Hypothetical global notification
+
+// 1. Error Code Mapping
+const ERROR_MAP: Record<number, string> = {
+  980: 'Não tem dados suficientes para continuar.',
+  401: 'Usuário ou senha inválidos.',
+  500: 'Erro interno do servidor. Tente novamente.',
+};
+
+export const useLogin = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { showError, showSuccess } = useNotification();
+
+  const login = async (credentials: LoginCredentials) => {
+    setIsLoading(true);
+    try {
+      // 2. Call Service
+      const response = await authService.login(credentials);
+      showSuccess('Bem-vindo!');
+      return response;
+    } catch (error: any) {
+      // 3. Map Error Code
+      const code = error?.response?.data?.code || error?.code;
+      const message = ERROR_MAP[code] || 'Ocorreu um erro inesperado.';
+
+      // 4. Trigger Notification
+      showError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 5. Return Clean Interface
+  return {
+    login,
+    isLoading,
+  };
+};
+```

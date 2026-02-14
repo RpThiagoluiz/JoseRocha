@@ -1,0 +1,52 @@
+---
+description: Core architecture principles
+globs: ['**/*.tsx']
+alwaysApply: false
+---
+
+# Project Architecture & Folder Structure
+
+Use this guide to determine where to place new files and how to structure code.
+
+## 📂 Folder Map
+
+| Path                       | Purpose            | Content Examples                                                   |
+| :------------------------- | :----------------- | :----------------------------------------------------------------- |
+| **`api/`**                 | API Communication  | `axiosConfig`, `endpoints/`, `services/`, `types/` (api specific). |
+| **`assets/`**              | Static Resources   | `fonts/`, `images/` (icons, logos), `styles/` (globals).           |
+| **`components/`**          | UI Components      | **Named exports only**. One component per folder.                  |
+| &nbsp;&nbsp;`├─ ui/`       | Base UI            | Atomic components (Buttons, Inputs) - akin to shadcn/ui.           |
+| &nbsp;&nbsp;`├─ layout/`   | Structure          | `Header`, `Footer`, `Sidebar`.                                     |
+| &nbsp;&nbsp;`├─ forms/`    | Form Logic         | `InputField`, `FormValidator`.                                     |
+| &nbsp;&nbsp;`├─ features/` | Domain Specific    | `ProductCard`, `UserProfile`.                                      |
+| **`contexts/`**            | Global State (Ctx) | React Contexts (Auth, Theme). Shared state only.                   |
+| **`hooks/`**               | Custom Hooks       | Reusable logic. Prefix `use*`. No loops/conditions.                |
+| **`pages/`**               | Routes/Views       | One folder per page (`HomePage/`, `Auth/`).                        |
+| **`routes/`**              | Routing Config     | `AppRoutes`, `Private/PublicRoute`, `routes.config`.               |
+| **`store/`**               | State Manager      | Global Store (Redux/Zustand). Slices by domain.                    |
+| **`types/`**               | Global Types       | `user.types.ts`, `global.d.ts`.                                    |
+| **`utils/`**               | Helpers            | Pure functions. `helpers/`, `constants/`, `validators/`.           |
+| **`__tests__/`**           | Testing            | `integration/`, `mocks/` (server, handlers).                       |
+
+## 📐 Key Architectural Rules
+
+1.  **API Layer**:
+    - Never call `axios` directly in components; use `api/services`.
+    - Split definition: `endpoints` (URLs) vs `services` (Functions).
+
+2.  **Components**:
+    - Always use **Named Exports**.
+    - Structure: `Component/index.ts` + `Component/Component.tsx`.
+    - `ui/` is for dumb/presentational components. `features/` is for business logic aware components.
+
+3.  **Utils**:
+    - Functions must be **pure** (deterministic).
+    - Avoid circular dependencies with domain layers.
+
+4.  **Pages**:
+    - Pages aggregate components. Logic specific to a page implies a sub-component in `components/`.
+    - Tests for pages go inside the page folder.
+
+5.  **State Management**:
+    - Use `contexts/` for low-frequency updates (Theme, Auth).
+    - Use `store/` for high-frequency/complex data (Data fetching, caching).

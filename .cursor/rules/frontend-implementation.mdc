@@ -1,0 +1,68 @@
+---
+description: Implementation
+globs: ['**/*.tsx']
+alwaysApply: false
+---
+
+# Implementation & Component Rules
+
+Follow these guidelines strictly when creating or refactoring components.
+
+## 1. Decision Tree: Where to put a new component?
+
+Before creating a file, answer these questions in order:
+
+1.  **Is it a primitive UI element?** (Button, Card, Input)
+    - **YES:** Check Shadcn UI first.
+      - If available: `npx shadcn@latest add <name>`.
+      - Location: `src/components/ui/`.
+    - _Note:_ Do not modify `ui/` components heavily unless necessary for the design system.
+
+2.  **Is it a Form helper?** (Validator, Special Input Wrapper)
+    - **YES:** Place in `src/components/forms/`.
+
+3.  **Is it a Generic Utility?** (LoadingSpinner, Modal, ErrorBoundary)
+    - **YES:** Place in `src/components/common/`.
+
+4.  **Is it a Layout block?** (Header, Sidebar, Footer)
+    - **YES:** Place in `src/components/layout/`.
+
+5.  **Is it a Business Feature?** (ProductCard, UserProfile)
+    - **CHECK:** Is this feature used on **multiple different pages**?
+      - **YES:** Place in `src/components/features/`.
+      - **NO (Only used on one page):** Place in `src/pages/<PageName>/components/`.
+
+## 2. Component Structure Rules
+
+Enforce consistency in file organization:
+
+- **Folder-based:** Always create a folder for the component.
+  - `src/components/features/UserProfile/`
+- **Files:**
+  - `UserProfile.tsx` (Component logic)
+  - `index.ts` (Export file)
+  - `UserProfile.test.tsx` (Tests)
+  - `styles.module.css` (Optional, if not using Tailwind only)
+- **Exports:**
+  - Use **Named Exports** only: `export const UserProfile = () => ...`
+  - Re-export in index: `export * from './UserProfile';`
+
+## 3. Styling & Theming
+
+Strictly adhere to `src/config/colors.config.ts`.
+
+- **Palette:** Use the defined HSL variables. The current theme is **Greyscale/Monochromatic**.
+- **Primary Color:** `hsl(222 47% 11%)` (Deep Grey).
+- **Tailwind Classes:**
+  - Use semantic names: `bg-primary`, `text-primary-foreground`, `bg-muted`.
+  - **FORBIDDEN:** Hardcoded hex values (e.g., `bg-[#111827]`) or arbitrary Tailwind colors (`bg-blue-500`) unless strictly required by a specific design exception.
+
+## 4. Implementation Checklist
+
+- [ ] Does this component already exist in Shadcn?
+- [ ] Does this component need to install with Shadcn, like `npx shadcn@latest add drawer` ?
+- [ ] If it's a page-specific component, is it inside `pages/`?
+- [ ] Are imports using absolute paths (`@/components/...`)?
+- [ ] Is the component exported via `index.ts`?
+- [ ] Is the new file in English?
+- [ ] Is the best practice for REACT 19 ?
