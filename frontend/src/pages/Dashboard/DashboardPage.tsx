@@ -4,6 +4,7 @@ import type { Asset } from '@/api/types'
 import { ASSETS_MOCK } from '@/mocks/assets.mock'
 import { BadgeAssetStatus } from '@/components/features/BadgeAssetStatus'
 import { AssetTable } from './components/AssetTable'
+import { DeleteAssetModal } from './components/DeleteAssetModal'
 import { AssetForm } from '@/pages/AssetForm/components/AssetForm'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,6 +17,7 @@ import {
 export const DashboardPage = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [assetToEdit, setAssetToEdit] = useState<Asset | null>(null)
+  const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
 
   const handleOpenNew = () => {
     setAssetToEdit(null)
@@ -35,6 +37,11 @@ export const DashboardPage = () => {
   const handleSuccess = () => {
     setDrawerOpen(false)
     setAssetToEdit(null)
+  }
+
+  const handleDeleteConfirm = () => {
+    console.log('Deletar ativo:', assetToDelete?.id)
+    setAssetToDelete(null)
   }
 
   const isEditMode = Boolean(assetToEdit)
@@ -77,8 +84,18 @@ export const DashboardPage = () => {
         </SheetContent>
       </Sheet>
       <div className="rounded-md border">
-        <AssetTable assets={ASSETS_MOCK} onEdit={handleEdit} />
+        <AssetTable
+          assets={ASSETS_MOCK}
+          onEdit={handleEdit}
+          onDeleteClick={(asset) => setAssetToDelete(asset)}
+        />
       </div>
+      <DeleteAssetModal
+        isOpen={!!assetToDelete}
+        onClose={() => setAssetToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        asset={assetToDelete}
+      />
     </div>
   )
 }

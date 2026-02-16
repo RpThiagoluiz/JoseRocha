@@ -26,9 +26,14 @@ const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
 interface AssetTableProps {
   assets: Asset[]
   onEdit?: (asset: Asset) => void
+  onDeleteClick?: (asset: Asset) => void
 }
 
-export const AssetTable = ({ assets, onEdit }: AssetTableProps) => {
+export const AssetTable = ({
+  assets,
+  onEdit,
+  onDeleteClick,
+}: AssetTableProps) => {
   const formatDate = (dateStr: string) => {
     return dateFormatter.format(new Date(dateStr))
   }
@@ -38,7 +43,7 @@ export const AssetTable = ({ assets, onEdit }: AssetTableProps) => {
   }
 
   const handleDelete = (asset: Asset) => {
-    console.log('[AssetTable] Delete clicked:', asset)
+    onDeleteClick?.(asset)
   }
 
   return (
