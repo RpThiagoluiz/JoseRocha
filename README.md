@@ -76,3 +76,8 @@ Pensando na escalabilidade e na experiência do usuário/desenvolvedor, os segui
 - [ ] **Otimização de Fetch no Modo Edição:** Como a listagem já devolve todos os dados do ativo, podemos passar esses dados diretamente para a tela de edição via state router, eliminando a necessidade de fazer uma nova requisição `GET /assets/{id}` (reduzindo chamadas de rede desnecessárias).
 - [ ] **Paginação:** Implementar paginação no backend e na tabela do frontend para suportar o crescimento do volume de ativos na base de dados.
 - [ ] **UX do Date Picker:** Dependendo da regra de negócio (se houver o cadastro de ativos muito antigos), substituir o calendário popover por um "Year/Month Picker" mais prático para a seleção rápida de anos distantes, ou habilitar a digitação nativa via máscara (DD/MM/AAAA).
+- [x] **Notificações:** Melhorias com um UX
+- [x] **Tabela:** Melhorias com um UX
+- [x] **Filtro:** Melhorias com um UX
+- [x] **Criação/Edição de Ativos:** Melhorias com um UX
+- [x] **Empty State:** Exibição de ícone quando a tabela está vazia.
