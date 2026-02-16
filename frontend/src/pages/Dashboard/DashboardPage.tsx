@@ -13,39 +13,54 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useGetAssets } from '@/features/assets/hooks/useGetAssets'
+import { useDeleteAsset } from '@/features/assets/hooks/useDeleteAsset'
+import { useGetAssetById } from '@/features/assets/hooks/useGetAssetById'
 
 export const DashboardPage = () => {
   const { data: assets, isLoading, error, refetch } = useGetAssets()
+  const { remove, isLoading: isDeleting } = useDeleteAsset()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [assetToEdit, setAssetToEdit] = useState<Asset | null>(null)
+  const [assetToEditId, setAssetToEditId] = useState<string | null>(null)
   const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
 
+  // Fetch asset data when editing
+  const { data: assetToEdit, isLoading: isLoadingAsset } = useGetAssetById(
+    assetToEditId || undefined
+  )
+
   const handleOpenNew = () => {
-    setAssetToEdit(null)
+    setAssetToEditId(null)
     setDrawerOpen(true)
   }
 
   const handleEdit = (asset: Asset) => {
-    setAssetToEdit(asset)
+    setAssetToEditId(asset.id)
     setDrawerOpen(true)
   }
 
   const handleDrawerChange = (open: boolean) => {
     setDrawerOpen(open)
-    if (!open) setAssetToEdit(null)
+    if (!open) {
+      setAssetToEditId(null)
+    }
   }
 
   const handleSuccess = () => {
     setDrawerOpen(false)
-    setAssetToEdit(null)
+    setAssetToEditId(null)
+    refetch()
   }
 
   const handleDeleteConfirm = () => {
-    console.log('Deletar ativo:', assetToDelete?.id)
-    setAssetToDelete(null)
+    if (!assetToDelete?.id) return
+
+    remove(assetToDelete.id, () => {
+      refetch()
+      setAssetToDelete(null)
+    })
   }
 
-  const isEditMode = Boolean(assetToEdit)
+  const isEditMode = Boolean(assetToEditId)
 
   return (
     <div className="space-y-6">
@@ -76,11 +91,15 @@ export const DashboardPage = () => {
             </SheetTitle>
           </SheetHeader>
           <div className="mt-6">
-            <AssetForm
-              key={assetToEdit?.id ?? 'new'}
-              asset={assetToEdit}
-              onSuccess={handleSuccess}
-            />
+            {isLoadingAsset ? (
+              <p className="text-muted-foreground">Carregando dados do ativo...</p>
+            ) : (
+              <AssetForm
+                key={assetToEdit?.id ?? 'new'}
+                initialData={assetToEdit || undefined}
+                onSuccess={handleSuccess}
+              />
+            )}
           </div>
         </SheetContent>
       </Sheet>
@@ -109,6 +128,7 @@ export const DashboardPage = () => {
         onClose={() => setAssetToDelete(null)}
         onConfirm={handleDeleteConfirm}
         asset={assetToDelete}
+        isDeleting={isDeleting}
       />
     </div>
   )
