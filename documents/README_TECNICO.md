@@ -1,76 +1,129 @@
 # README Técnico — Assets Manager
 
-Este documento descreve como executar o projeto **assets-manager** em ambiente local. O uso do **Docker** é **obrigatório** para garantir consistência de ambiente (banco de dados e, quando aplicável, demais serviços).
+Este documento descreve como configurar, executar e testar o projeto **assets-manager** em ambiente local de desenvolvimento. A arquitetura é um monorepo Fullstack. O uso do **Docker** é **obrigatório** para garantir a consistência do ambiente de banco de dados e a conteinerização da aplicação.
 
 ---
 
-## Pré-requisitos
+## 🛠️ Pré-requisitos
 
-- **Docker** — Obrigatório. Utilizado para subir o PostgreSQL e manter o ambiente alinhado ao que será usado em outros ambientes.
-- **Java 17 (LTS)** — Necessário para desenvolvimento local (compilação, testes e execução da aplicação via Maven ou IDE).
+Para o desenvolvimento local, certifique-se de ter as seguintes ferramentas instaladas:
 
-Certifique-se de que o Docker está em execução antes de rodar a aplicação ou os testes.
+- **Docker & Docker Compose** — Obrigatório para subir a stack completa ou apenas o PostgreSQL.
+- **Java 17 (LTS)** — Necessário para compilação, testes e execução do Backend via Maven/IDE.
+- **Node.js (v18+ ou v20+)** — Necessário para rodar o servidor de desenvolvimento do Frontend (Vite) e os Git Hooks.
 
 ---
 
-## Como rodar o projeto
+## 🚀 Execução Completa (Orquestração via Docker)
 
-### 1. Subir o PostgreSQL com Docker
-
-Na raiz do monorepo (ou no diretório onde estiver o `docker-compose`, se houver), execute:
+Se o objetivo é apenas rodar a aplicação para testes e validações (sem necessidade de _Hot Reload_ no código), utilize a orquestração completa. Na raiz do monorepo, execute:
 
 ```bash
-docker run -d --name assets-postgres \
-  -e POSTGRES_DB=assets_db \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 \
-  postgres:16-alpine
+docker-compose up -d --build
+
 ```
 
-Ou, se existir um `docker-compose.yml` na raiz:
+Isso subirá 3 containers configurados na mesma rede:
+
+1. `postgres` (Banco de Dados)
+2. `backend` (Spring Boot API na porta `8080`)
+3. `frontend` (React/Vite servido via Nginx na porta `5173`)
+
+---
+
+## 💻 Desenvolvimento Local (Modo Dev)
+
+Para atuar no código com _Hot Reload_, você precisará subir a infraestrutura base e rodar as aplicações localmente.
+
+### 1. Subir a Infraestrutura (PostgreSQL)
+
+Na raiz do projeto, suba apenas o serviço do banco de dados utilizando o `docker-compose`:
 
 ```bash
-docker-compose up -d
+docker-compose up -d postgres
+
 ```
 
-### 2. Executar a aplicação
+### 2. Executar o Backend (Spring Boot)
 
-Entre no diretório do backend e inicie a aplicação com Maven:
+Abra um terminal, entre no diretório do backend e inicie a API:
 
 ```bash
 cd backend
 mvn spring-boot:run
+
 ```
 
-A API ficará disponível em `http://localhost:8080`. A documentação Swagger UI estará em `http://localhost:8080/swagger-ui.html`.
+- **API Mapeada em:** `http://localhost:8080`
+- **Swagger UI:** `http://localhost:8080/swagger-ui/index.html`
 
-### 3. Executar os testes
+### 3. Executar o Frontend (React/Vite)
 
-Com o Docker em execução (para testes que usam Testcontainers):
+Abra um novo terminal, entre no diretório do frontend e inicie o servidor de desenvolvimento:
+
+```bash
+cd frontend
+npm install
+npm run dev
+
+```
+
+- **Interface Mapeada em:** `http://localhost:5173`
+
+---
+
+## 🧪 Como Executar os Testes
+
+O projeto conta com testes automatizados em ambas as camadas.
+
+**Testes do Backend (JUnit / Testcontainers):**
+_Nota: O Docker precisa estar em execução para que o Testcontainers consiga provisionar o banco de testes efêmero._
 
 ```bash
 cd backend
 mvn test
+
+```
+
+**Testes do Frontend (Vitest / Testing Library):**
+Os testes validam os custom hooks, serviços de API (com mocks do Axios) e as regras de negócio de integração.
+
+```bash
+cd frontend
+npm run test
+# Ou para rodar apenas uma vez no terminal:
+npm run test:run
+
 ```
 
 ---
 
-## Variáveis de ambiente (opcional)
+## ⚙️ Variáveis de Ambiente
 
-É possível sobrescrever a configuração padrão do `application.yml`:
+As aplicações foram desenhadas para rodar de forma conteinerizada (via `docker-compose`), mas caso precise sobrescrever as configurações localmente, utilize as variáveis abaixo.
 
-| Variável           | Descrição              | Padrão    |
-|--------------------|------------------------|-----------|
-| `POSTGRES_DB`      | Nome do banco          | `assets_db` |
-| `POSTGRES_USER`    | Usuário PostgreSQL     | `postgres`  |
-| `POSTGRES_PASSWORD`| Senha PostgreSQL       | `postgres`  |
-| `SERVER_PORT`      | Porta da aplicação     | `8080`      |
+### Backend (`backend/src/main/resources/application.yml`)
+
+| Variável            | Descrição          | Padrão (Local) |
+| ------------------- | ------------------ | -------------- |
+| `POSTGRES_DB`       | Nome do banco      | `assets_db`    |
+| `POSTGRES_USER`     | Usuário PostgreSQL | `admin`        |
+| `POSTGRES_PASSWORD` | Senha PostgreSQL   | `admin`        |
+| `SERVER_PORT`       | Porta da aplicação | `8080`         |
+
+### Frontend (`frontend/.env`)
+
+Para rodar localmente sem o Docker, você pode criar um arquivo `.env` na pasta `frontend` com:
+| Variável | Descrição | Padrão (Local) |
+|-------------------------|-------------------------------------------|--------------------------|
+| `VITE_BASE_URL` | URL base para chamadas da API do Backend | `http://localhost:8080` |
+| `VITE_AUTH_STORAGE_KEY` | Chave de persistência de sessão (Storage) | `app_auth_user` |
 
 ---
 
-## Resumo
+### Resumo do Fluxo de Trabalho:
 
-- **Docker** é obrigatório para o banco de dados (e para testes com Testcontainers).
-- **Java 17** é exigido para build e execução em desenvolvimento.
-- Suba o PostgreSQL via Docker, depois execute `mvn spring-boot:run` no diretório `backend`.
+1. Docker obrigatoriamente ligado.
+2. `npm install` na raiz para configurar o **Husky** (validador de commits).
+3. `docker-compose up -d postgres` para ter o banco.
+4. Rode as aplicações nas suas respectivas pastas para começar a codar.
