@@ -28,7 +28,22 @@ export const BadgeAssetStatus = ({ status, className }: BadgeAssetStatusProps) =
       className={cn('min-w-[7.5rem] justify-start gap-1.5', className)}
     >
       <Icon className="h-3.5 w-3.5" />
-      {status}
+      {TranslateStatus({ status })}
     </Badge>
   )
+}
+
+const TranslateStatus = ({ status }: { status: AssetStatus }) => {
+  switch (status) {
+    case 'AVAILABLE':
+      return 'Disponível'
+    case 'IN_USE':
+      return 'Em uso'
+    case 'MAINTENANCE':
+      return 'Manutenção'
+    case 'DISPOSED':
+      return 'Disposto'
+    default:
+      return status
+  }
 }
