@@ -3,11 +3,16 @@ import { apiClient } from '@/api/axios'
 import { ASSETS_ENDPOINTS } from '@/api/endpoints/assets.endpoints'
 
 /**
- * Fetches all assets from the API.
+ * Fetches all assets from the API with optional filters.
+ * @param params Optional query params (name, serialNumber, status).
  * @returns Promise resolving to an array of assets.
  */
-export const getAssets = async (): Promise<Asset[]> => {
-  const response = await apiClient.get<Asset[]>(ASSETS_ENDPOINTS.GET_ALL)
+export const getAssets = async (
+  params?: Record<string, string>
+): Promise<Asset[]> => {
+  const response = await apiClient.get<Asset[]>(ASSETS_ENDPOINTS.GET_ALL, {
+    params: params ?? {},
+  })
   return response.data
 }
 

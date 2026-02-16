@@ -46,8 +46,24 @@ describe('assets.service', () => {
 
       const result = await getAssets()
 
-      expect(apiClient.get).toHaveBeenCalledWith(ASSETS_ENDPOINTS.GET_ALL)
+      expect(apiClient.get).toHaveBeenCalledWith(
+        ASSETS_ENDPOINTS.GET_ALL,
+        expect.objectContaining({ params: expect.anything() })
+      )
       expect(result).toEqual(mockAssets)
+    })
+
+    it('should pass filter params when provided', async () => {
+      const mockAssets: Asset[] = []
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: mockAssets,
+      } as never)
+
+      await getAssets({ name: 'laptop', status: 'AVAILABLE' })
+
+      expect(apiClient.get).toHaveBeenCalledWith(ASSETS_ENDPOINTS.GET_ALL, {
+        params: { name: 'laptop', status: 'AVAILABLE' },
+      })
     })
 
     it('should handle API errors when fetching assets', async () => {
@@ -55,7 +71,10 @@ describe('assets.service', () => {
       vi.mocked(apiClient.get).mockRejectedValue(error)
 
       await expect(getAssets()).rejects.toThrow('Network error')
-      expect(apiClient.get).toHaveBeenCalledWith(ASSETS_ENDPOINTS.GET_ALL)
+      expect(apiClient.get).toHaveBeenCalledWith(
+        ASSETS_ENDPOINTS.GET_ALL,
+        expect.objectContaining({ params: expect.anything() })
+      )
     })
   })
 
