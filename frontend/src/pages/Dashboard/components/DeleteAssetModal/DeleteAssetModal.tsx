@@ -16,6 +16,7 @@ interface DeleteAssetModalProps {
   onClose: () => void
   onConfirm: () => void
   asset: Asset | null
+  isDeleting?: boolean
 }
 
 export const DeleteAssetModal = ({
@@ -23,6 +24,7 @@ export const DeleteAssetModal = ({
   onClose,
   onConfirm,
   asset,
+  isDeleting = false,
 }: DeleteAssetModalProps) => {
   const handleConfirm = () => {
     onConfirm()
@@ -45,9 +47,13 @@ export const DeleteAssetModal = ({
           </div>
         )}
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <Button variant="destructive" onClick={handleConfirm}>
-            Confirmar
+          <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+          <Button
+            variant="destructive"
+            onClick={handleConfirm}
+            disabled={isDeleting}
+          >
+            {isDeleting ? 'Excluindo...' : 'Confirmar'}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
