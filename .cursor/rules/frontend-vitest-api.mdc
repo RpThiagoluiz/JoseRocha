@@ -1,0 +1,89 @@
+---
+description: Vitest configuration and API testing standards
+globs: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx']
+alwaysApply: false
+---
+
+# Vitest API Testing Guidelines
+
+This rule complements the frontend-testing.mdc guide, specifying Vitest usage instead of Jest.
+
+## Testing Framework
+
+- **Vitest** is the testing framework (not Jest).
+- Use `vi` from `vitest` for mocking utilities.
+- Use `describe`, `it`, `expect` from `vitest` (globals enabled).
+
+## API Services Testing
+
+- **API Services** must be tested by mocking the Axios instance (`apiClient`).
+- Mock `@/api/axios` using `vi.mock('@/api/axios')`.
+- Verify that service functions call the correct endpoints and return the expected data.
+- Test both success and error scenarios.
+
+Example pattern:
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { apiClient } from '@/api/axios'
+import { getAssets } from '@/api/services/assets.service'
+
+vi.mock('@/api/axios')
+
+describe('getAssets', () => {
+  it('should fetch assets successfully', async () => {
+    const mockAssets = [{ id: '1', name: 'Asset 1' }]
+    vi.mocked(apiClient.get).mockResolvedValue({ data: mockAssets })
+    
+    const result = await getAssets()
+    
+    expect(result).toEqual(mockAssets)
+    expect(apiClient.get).toHaveBeenCalledWith('/assets')
+  })
+})
+```
+
+## Custom Hooks Testing
+
+- **Custom Hooks** (e.g., `useGetAssets`, `useCreateAsset`) must be tested using `renderHook` from `@testing-library/react`.
+- Validate state changes: `isLoading`, `data`, `error`.
+- Mock the underlying service functions (e.g., `getAssets`, `createAsset`).
+- Mock `sonner` toast notifications when testing error scenarios.
+
+Example pattern:
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderHook, waitFor } from '@testing-library/react'
+import { getAssets } from '@/api/services/assets.service'
+import { useGetAssets } from './useGetAssets'
+
+vi.mock('@/api/services/assets.service')
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn() }
+}))
+
+describe('useGetAssets', () => {
+  it('should initialize with loading state and fetch data', async () => {
+    const mockAssets = [{ id: '1', name: 'Asset 1' }]
+    vi.mocked(getAssets).mockResolvedValue(mockAssets)
+    
+    const { result } = renderHook(() => useGetAssets())
+    
+    expect(result.current.isLoading).toBe(true)
+    
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+    
+    expect(result.current.data).toEqual(mockAssets)
+  })
+})
+```
+
+## Test Organization
+
+- Follow **Behavior > Implementation** philosophy.
+- Test descriptions in **English** (`describe`, `it` blocks).
+- Assertions should validate real behavior, not implementation details.
+- Use meaningful test data that reflects real-world scenarios.
