@@ -1,6 +1,7 @@
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import type { Asset } from '@/api/types'
 import { BadgeAssetStatus } from '@/components/features/BadgeAssetStatus'
+import { dateUtils } from '@/utils/dateUtils'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -17,12 +18,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-})
-
 interface AssetTableProps {
   assets: Asset[]
   onEdit?: (asset: Asset) => void
@@ -34,10 +29,6 @@ export const AssetTable = ({
   onEdit,
   onDeleteClick,
 }: AssetTableProps) => {
-  const formatDate = (dateStr: string) => {
-    return dateFormatter.format(new Date(dateStr))
-  }
-
   const handleEdit = (asset: Asset) => {
     onEdit?.(asset)
   }
@@ -62,7 +53,7 @@ export const AssetTable = ({
           <TableRow key={asset.id}>
             <TableCell className="font-medium">{asset.name}</TableCell>
             <TableCell>{asset.serialNumber}</TableCell>
-            <TableCell>{formatDate(asset.acquisitionDate)}</TableCell>
+            <TableCell>{dateUtils.formatDisplay(asset.acquisitionDate)}</TableCell>
             <TableCell>
               <BadgeAssetStatus status={asset.status} />
             </TableCell>
