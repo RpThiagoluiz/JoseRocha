@@ -33,6 +33,11 @@ const AssetFormPage = load(
   'AssetFormPage',
 )
 
+const NotFoundPage = load(
+  () => import('@/pages/NotFound'),
+  'NotFoundPage',
+)
+
 export const routesConfig: RouteObject[] = [
   {
     path: '/login',
@@ -62,7 +67,7 @@ export const routesConfig: RouteObject[] = [
           },
           {
             path: '*',
-            element: <Navigate to="/dashboard" replace />,
+            element: <NotFoundPage />,
           },
         ],
       },
