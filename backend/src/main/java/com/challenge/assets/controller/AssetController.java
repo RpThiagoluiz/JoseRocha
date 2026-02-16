@@ -24,6 +24,7 @@ import java.util.UUID;
  * All errors return structured {@link com.challenge.assets.dto.error.ApiErrorResponse} (400, 404, 409, 500).
  */
 @RestController
+@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
 @RequestMapping("/assets")
 @RequiredArgsConstructor
 @Tag(name = "Assets", description = "Asset CRUD API")
