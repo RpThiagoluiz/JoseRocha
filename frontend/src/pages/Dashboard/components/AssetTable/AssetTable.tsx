@@ -38,50 +38,56 @@ export const AssetTable = ({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Nome</TableHead>
-          <TableHead>Número de Série</TableHead>
-          <TableHead>Data de Aquisição</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="text-right">Ações</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {assets.map((asset) => (
-          <TableRow key={asset.id}>
-            <TableCell className="font-medium">{asset.name}</TableCell>
-            <TableCell>{asset.serialNumber}</TableCell>
-            <TableCell>{dateUtils.formatDisplay(asset.acquisitionDate)}</TableCell>
-            <TableCell>
-              <BadgeAssetStatus status={asset.status} />
-            </TableCell>
-            <TableCell className="text-right">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Ações">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleEdit(asset)}>
-                    <Pencil className="h-4 w-4" />
-                    Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleDelete(asset)}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
+    <div className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Nome</TableHead>
+            <TableHead>Número de Série</TableHead>
+            <TableHead>Data de Aquisição</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {assets.map((asset, index) => (
+            <TableRow
+              key={asset.id}
+              className="cursor-default animate-slide-in-bottom-500 transition-colors hover:bg-muted/50"
+              style={{ animationDelay: `${index * 40}ms`, animationFillMode: 'backwards' }}
+            >
+              <TableCell className="font-medium">{asset.name}</TableCell>
+              <TableCell>{asset.serialNumber}</TableCell>
+              <TableCell>{dateUtils.formatDisplay(asset.acquisitionDate)}</TableCell>
+              <TableCell>
+                <BadgeAssetStatus status={asset.status} />
+              </TableCell>
+              <TableCell className="text-right">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" aria-label="Ações">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleEdit(asset)}>
+                      <Pencil className="h-4 w-4" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(asset)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   )
 }

@@ -14,12 +14,16 @@ export const MainLayout = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Gestão de Ativos</h1>
+      <header
+        className="sticky top-0 z-50 w-full border-b bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      >
+        <div className="container mx-auto flex items-center justify-between px-4 py-4">
+          <h1 className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-xl font-semibold text-transparent">
+            Gestão de Ativos
+          </h1>
           <div className="flex items-center gap-3">
             {user?.email && (
-              <span className="text-sm text-primary-foreground/90 truncate max-w-[200px] sm:max-w-none">
+              <span className="max-w-[200px] truncate text-sm text-muted-foreground sm:max-w-none">
                 {user.email}
               </span>
             )}
@@ -28,7 +32,7 @@ export const MainLayout = () => {
               variant="ghost"
               size="icon"
               onClick={handleLogout}
-              className="text-primary-foreground hover:bg-primary-foreground/10"
+              className="text-foreground hover:bg-muted/80"
               aria-label="Sair"
             >
               <LogOut className="h-5 w-5" />
@@ -36,7 +40,7 @@ export const MainLayout = () => {
           </div>
         </div>
       </header>
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto animate-fade-in-700 px-4 py-8 sm:px-8">
         <Outlet />
       </main>
     </div>

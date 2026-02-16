@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { format, isAfter, isBefore, startOfDay } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { CalendarIcon, Trash2 } from 'lucide-react'
+import { CalendarIcon, Loader2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { dateUtils } from '@/utils/dateUtils'
 import type { Asset, AssetStatus, AssetRequest } from '@/api/types'
@@ -121,9 +121,15 @@ export const AssetForm = ({
     }
   }
 
+  const inputFocusClass =
+    'focus-visible:ring-primary/50 focus-visible:ring-offset-2 transition-shadow'
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="animate-slide-in-left-500 space-y-6"
+      >
         <FormField
           control={form.control}
           name="name"
@@ -131,7 +137,11 @@ export const AssetForm = ({
             <FormItem>
               <FormLabel>Nome</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: Laptop Dell" {...field} />
+                <Input
+                  placeholder="Ex: Laptop Dell"
+                  className={inputFocusClass}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -144,7 +154,11 @@ export const AssetForm = ({
             <FormItem>
               <FormLabel>Número de Série</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: SN-001" {...field} />
+                <Input
+                  placeholder="Ex: SN-001"
+                  className={inputFocusClass}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -160,10 +174,10 @@ export const AssetForm = ({
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant={"outline"}
+                      variant="outline"
                       className={cn(
-                        "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
+                        'w-full pl-3 text-left font-normal transition-shadow focus-visible:ring-primary/50 focus-visible:ring-offset-2',
+                        !field.value && 'text-muted-foreground'
                       )}
                     >
                       {field.value ? (
@@ -203,7 +217,7 @@ export const AssetForm = ({
               <FormLabel>Status</FormLabel>
               <FormControl>
                 <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
                   value={field.value ?? ''}
                   onChange={(e) =>
                     field.onChange(e.target.value as AssetStatus | '')
@@ -226,7 +240,7 @@ export const AssetForm = ({
               type="button"
               variant="outline"
               onClick={() => form.reset()}
-              className="w-[120px]"
+              className="w-[120px] transition-transform active:scale-[0.98]"
             >
               <Trash2 className="h-4 w-4" />
               Limpar
@@ -234,10 +248,17 @@ export const AssetForm = ({
           )}
           <Button
             type="submit"
-            className="w-[240px]"
+            className="w-[240px] transition-transform active:scale-[0.98]"
             disabled={!canSave || isLoading}
           >
-            {isLoading ? 'Salvando...' : 'Salvar'}
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              'Salvar'
+            )}
           </Button>
         </div>
       </form>
