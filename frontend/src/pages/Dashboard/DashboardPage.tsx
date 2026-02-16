@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import type { Asset } from '@/api/types'
 import { BadgeAssetStatus } from '@/components/features/BadgeAssetStatus'
+import { AssetFilter } from './components/AssetFilter'
 import { AssetTable } from './components/AssetTable'
 import { DeleteAssetModal } from './components/DeleteAssetModal'
 import { AssetForm } from '@/pages/AssetForm/components/AssetForm'
@@ -17,7 +18,8 @@ import { useDeleteAsset } from '@/features/assets/hooks/useDeleteAsset'
 import { useGetAssetById } from '@/features/assets/hooks/useGetAssetById'
 
 export const DashboardPage = () => {
-  const { data: assets, isLoading, error, refetch } = useGetAssets()
+  const [filters, setFilters] = useState<Record<string, string>>({})
+  const { data: assets, isLoading, error, refetch } = useGetAssets(filters)
   const { remove, isLoading: isDeleting } = useDeleteAsset()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [assetToEditId, setAssetToEditId] = useState<string | null>(null)
@@ -103,6 +105,7 @@ export const DashboardPage = () => {
           </div>
         </SheetContent>
       </Sheet>
+      <AssetFilter onFilter={setFilters} />
       <div className="rounded-md border">
         {isLoading ? (
           <div className="p-8 text-center text-muted-foreground">
