@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
+import { showNotification } from '@/utils/notification'
 import { useAuth } from '@/contexts'
 import { Button } from '@/components/ui/button'
 import {
@@ -55,10 +55,10 @@ export const LoginPage = () => {
   const onSubmit = async (values: LoginFormValues) => {
     try {
       await login(values.email, values.password)
-      toast.success('Login realizado com sucesso!')
+      showNotification({ type: 'success', message: 'Login realizado com sucesso!' })
       navigate('/dashboard', { replace: true })
     } catch {
-      toast.error('Falha ao entrar. Tente novamente.')
+      showNotification({ type: 'error', message: 'Falha ao entrar. Tente novamente.' })
     }
   }
 

@@ -3,15 +3,13 @@ import { renderHook, waitFor } from '@testing-library/react'
 import type { Asset } from '@/api/types'
 import { getAssets } from '@/api/services/assets.service'
 import { useGetAssets } from './useGetAssets'
-import { toast } from 'sonner'
 import { getErrorMessage } from '@/utils/errorMapper'
+import { showNotification } from '@/utils/notification'
 
 vi.mock('@/api/services/assets.service')
 vi.mock('@/utils/errorMapper')
-vi.mock('sonner', () => ({
-  toast: {
-    error: vi.fn(),
-  },
+vi.mock('@/utils/notification', () => ({
+  showNotification: vi.fn(),
 }))
 
 describe('useGetAssets', () => {
@@ -128,7 +126,7 @@ describe('useGetAssets', () => {
       expect(result.current.error).toBe(errorMessage)
       expect(result.current.data).toEqual([])
       expect(getErrorMessage).toHaveBeenCalledWith(mockError)
-      expect(toast.error).toHaveBeenCalledWith(errorMessage)
+      expect(showNotification).toHaveBeenCalledWith({ type: 'error', message: errorMessage })
     })
 
     it('should handle errors with AST-001 code', async () => {
@@ -152,7 +150,7 @@ describe('useGetAssets', () => {
       })
 
       expect(result.current.error).toBe(errorMessage)
-      expect(toast.error).toHaveBeenCalledWith(errorMessage)
+      expect(showNotification).toHaveBeenCalledWith({ type: 'error', message: errorMessage })
     })
 
     it('should handle errors with unknown codes', async () => {
@@ -177,7 +175,7 @@ describe('useGetAssets', () => {
 
       // Should use default error message for unknown codes
       expect(result.current.error).toBe(errorMessage)
-      expect(toast.error).toHaveBeenCalledWith(errorMessage)
+      expect(showNotification).toHaveBeenCalledWith({ type: 'error', message: errorMessage })
     })
 
     it('should handle errors without response structure', async () => {
@@ -195,7 +193,7 @@ describe('useGetAssets', () => {
 
       // Should use default error message
       expect(result.current.error).toBe(errorMessage)
-      expect(toast.error).toHaveBeenCalledWith(errorMessage)
+      expect(showNotification).toHaveBeenCalledWith({ type: 'error', message: errorMessage })
     })
 
     it('should clear error state when refetching after an error', async () => {

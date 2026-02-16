@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { toast } from 'sonner'
+import { showNotification } from '@/utils/notification'
 import type { Asset } from '@/api/types'
 import { getAssetById } from '@/api/services/assets.service'
 import { getErrorMessage } from '@/utils/errorMapper'
@@ -33,7 +33,7 @@ export const useGetAssetById = (id?: string) => {
       } catch (err: unknown) {
         const message = getErrorMessage(err)
         setError(message)
-        toast.error(message)
+        showNotification({ type: 'error', message })
       } finally {
         setIsLoading(false)
       }

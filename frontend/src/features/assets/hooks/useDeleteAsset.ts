@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { showNotification } from '@/utils/notification'
 import { deleteAsset } from '@/api/services/assets.service'
 import { getErrorMessage } from '@/utils/errorMapper'
 
@@ -16,11 +16,11 @@ export const useDeleteAsset = () => {
     setIsLoading(true)
     try {
       await deleteAsset(id)
-      toast.success('Ativo excluído com sucesso!')
+      showNotification({ type: 'success', message: 'Ativo excluído com sucesso!' })
       onSuccess?.()
     } catch (err: unknown) {
       const message = getErrorMessage(err)
-      toast.error(message)
+      showNotification({ type: 'error', message })
     } finally {
       setIsLoading(false)
     }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { showNotification } from '@/utils/notification'
 import type { AssetRequest } from '@/api/types'
 import { updateAsset } from '@/api/services/assets.service'
 import { getErrorMessage } from '@/utils/errorMapper'
@@ -21,11 +21,11 @@ export const useUpdateAsset = () => {
     setIsLoading(true)
     try {
       await updateAsset(id, data)
-      toast.success('Ativo atualizado!')
+      showNotification({ type: 'success', message: 'Ativo atualizado!' })
       onSuccess?.()
     } catch (err: unknown) {
       const message = getErrorMessage(err)
-      toast.error(message)
+      showNotification({ type: 'error', message })
     } finally {
       setIsLoading(false)
     }
