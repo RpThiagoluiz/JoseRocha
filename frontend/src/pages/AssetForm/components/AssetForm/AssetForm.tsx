@@ -1,8 +1,11 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Trash2 } from 'lucide-react'
-import type { Asset, AssetStatus } from '@/api/types'
+import type { Asset, AssetStatus, AssetRequest } from '@/api/types'
+import { useCreateAsset } from '@/features/assets/hooks/useCreateAsset'
+import { useUpdateAsset } from '@/features/assets/hooks/useUpdateAsset'
 import {
   Form,
   FormControl,
@@ -54,6 +57,13 @@ const isoToBrDate = (iso: string): string => {
   return `${day}/${month}/${year}`
 }
 
+/** Converte dd/mm/aaaa para ISO */
+const brDateToIso = (brDate: string): string => {
+  const [day, month, year] = brDate.split('/').map(Number)
+  const date = new Date(year, month - 1, day)
+  return date.toISOString()
+}
+
 /** Formata input para dd/mm/aaaa enquanto digita */
 const formatBrDate = (value: string): string => {
   const digits = value.replace(/\D/g, '').slice(0, 8)
@@ -74,18 +84,27 @@ export type AssetFormValues = z.infer<typeof assetFormSchema>
 
 interface AssetFormProps {
   asset?: Asset | null
+  initialData?: Asset
   defaultValues?: Partial<AssetFormValues>
   onSuccess?: () => void
 }
 
 export const AssetForm = ({
   asset,
+  initialData,
   defaultValues,
   onSuccess,
 }: AssetFormProps) => {
-  const isEditMode = Boolean(asset)
-  const initialValues = asset
-    ? assetToFormValues(asset)
+  const { create, isLoading: isCreating } = useCreateAsset()
+  const { update, isLoading: isUpdating } = useUpdateAsset()
+  const isLoading = isCreating || isUpdating
+
+  // Use initialData if provided, otherwise fall back to asset prop (for backward compatibility)
+  const assetData = initialData || asset
+  const isEditMode = Boolean(assetData)
+
+  const initialValues = assetData
+    ? assetToFormValues(assetData)
     : {
         name: '',
         serialNumber: '',
@@ -99,12 +118,34 @@ export const AssetForm = ({
     defaultValues: initialValues,
   })
 
+  // Reset form when initialData changes (for edit mode)
+  useEffect(() => {
+    if (assetData) {
+      form.reset(assetToFormValues(assetData))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetData?.id])
+
   const isDirty = form.formState.isDirty
   const canSave = !isEditMode || isDirty
 
-  const onSubmit = (values: AssetFormValues) => {
-    console.log('[AssetForm] Dados do formulário:', values)
-    onSuccess?.()
+  const onSubmit = async (values: AssetFormValues) => {
+    const assetRequest: AssetRequest = {
+      name: values.name,
+      serialNumber: values.serialNumber,
+      acquisitionDate: brDateToIso(values.acquisitionDate),
+      status: values.status,
+    }
+
+    if (assetData?.id) {
+      await update(assetData.id, assetRequest, () => {
+        onSuccess?.()
+      })
+    } else {
+      await create(assetRequest, () => {
+        onSuccess?.()
+      })
+    }
   }
 
   return (
@@ -193,8 +234,12 @@ export const AssetForm = ({
               Limpar
             </Button>
           )}
-          <Button type="submit" className="w-[240px]" disabled={!canSave}>
-            Salvar
+          <Button
+            type="submit"
+            className="w-[240px]"
+            disabled={!canSave || isLoading}
+          >
+            {isLoading ? 'Salvando...' : 'Salvar'}
           </Button>
         </div>
       </form>
