@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import type { Asset } from '@/api/types'
-import { ASSETS_MOCK } from '@/mocks/assets.mock'
 import { BadgeAssetStatus } from '@/components/features/BadgeAssetStatus'
 import { AssetTable } from './components/AssetTable'
 import { DeleteAssetModal } from './components/DeleteAssetModal'
@@ -13,8 +12,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { useGetAssets } from '@/features/assets/hooks/useGetAssets'
 
 export const DashboardPage = () => {
+  const { data: assets, isLoading, error, refetch } = useGetAssets()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [assetToEdit, setAssetToEdit] = useState<Asset | null>(null)
   const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
@@ -84,11 +85,24 @@ export const DashboardPage = () => {
         </SheetContent>
       </Sheet>
       <div className="rounded-md border">
-        <AssetTable
-          assets={ASSETS_MOCK}
-          onEdit={handleEdit}
-          onDeleteClick={(asset) => setAssetToDelete(asset)}
-        />
+        {isLoading ? (
+          <div className="p-8 text-center text-muted-foreground">
+            Carregando ativos...
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center space-y-4">
+            <p className="text-destructive">{error}</p>
+            <Button onClick={refetch} variant="outline">
+              Tentar Novamente
+            </Button>
+          </div>
+        ) : (
+          <AssetTable
+            assets={assets || []}
+            onEdit={handleEdit}
+            onDeleteClick={(asset) => setAssetToDelete(asset)}
+          />
+        )}
       </div>
       <DeleteAssetModal
         isOpen={!!assetToDelete}
