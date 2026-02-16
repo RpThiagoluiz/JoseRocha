@@ -1,6 +1,7 @@
 package com.challenge.assets.exception;
 
 import com.challenge.assets.dto.error.ApiErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 /**
  * Global exception handler that returns structured {@link ApiErrorResponse} for all API errors.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -57,11 +59,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGeneralException(Exception ex) {
+        log.error("Erro interno não tratado: ", ex);
         ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
         ApiErrorResponse body = buildResponse(
                 errorCode.getHttpStatus().value(),
                 errorCode.getCode(),
-                ex.getMessage() != null ? ex.getMessage() : errorCode.getMessage(),
+                errorCode.getMessage(),
                 null
         );
         return ResponseEntity.status(errorCode.getHttpStatus()).body(body);

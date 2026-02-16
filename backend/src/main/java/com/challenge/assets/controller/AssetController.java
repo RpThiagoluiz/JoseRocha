@@ -1,9 +1,11 @@
 package com.challenge.assets.controller;
 
+import com.challenge.assets.domain.enums.AssetStatus;
 import com.challenge.assets.dto.AssetRequest;
 import com.challenge.assets.dto.AssetResponse;
 import com.challenge.assets.service.AssetService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,14 +34,23 @@ public class AssetController {
 
     private final AssetService service;
 
+    @Operation(summary = "Listar todos os ativos", description = "Retorna uma lista de ativos. Pode ser filtrada opcionalmente por nome, número de série ou status.")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "List all assets")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = com.challenge.assets.dto.error.ApiErrorResponse.class)))
     })
-    public List<AssetResponse> list() {
-        return service.findAll();
+    public ResponseEntity<List<AssetResponse>> getAll(
+            @Parameter(description = "Filtra pelo nome do ativo (busca parcial)")
+            @RequestParam(required = false) String name,
+
+            @Parameter(description = "Filtra pelo número de série (busca parcial)")
+            @RequestParam(required = false) String serialNumber,
+
+            @Parameter(description = "Filtra pelo status exato do ativo")
+            @RequestParam(required = false) AssetStatus status) {
+
+        return ResponseEntity.ok(service.findAll(name, serialNumber, status));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

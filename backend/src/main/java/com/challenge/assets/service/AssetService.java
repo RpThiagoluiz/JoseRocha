@@ -1,6 +1,7 @@
 package com.challenge.assets.service;
 
 import com.challenge.assets.domain.Asset;
+import com.challenge.assets.domain.enums.AssetStatus;
 import com.challenge.assets.dto.AssetRequest;
 import com.challenge.assets.dto.AssetResponse;
 import com.challenge.assets.exception.AssetAlreadyExistsException;
@@ -43,11 +44,19 @@ public class AssetService {
     }
 
     /**
-     * Returns all assets.
+     * Returns assets with optional filters. All parameters are optional; when null, no filter is applied.
+     *
+     * @param name         optional filter for name (partial, case-insensitive)
+     * @param serialNumber optional filter for serial number (partial, case-insensitive)
+     * @param status       optional filter for exact status match
+     * @return list of matching assets
      */
     @Transactional(readOnly = true)
-    public List<AssetResponse> findAll() {
-        return repository.findAll().stream()
+    public List<AssetResponse> findAll(String name, String serialNumber, AssetStatus status) {
+        String searchName = name == null ? "" : name;
+        String searchSerial = serialNumber == null ? "" : serialNumber;
+        return repository.findWithFilters(searchName, searchSerial, status)
+                .stream()
                 .map(mapper::toResponse)
                 .toList();
     }
